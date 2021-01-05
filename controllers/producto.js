@@ -2,85 +2,52 @@
 var fs = require('fs');
 var path = require('path');
 var bcrypt = require('bcrypt-nodejs');
-var Root = require('../models/root');
+var Producto = require('../models/producto');
 var jwt = require('../services/jwtRoot');
 
 
 function pruebas(req, res){
 	res.status(200).send({
-		message: 'Probando controlador de root perron'
+		message: 'Probando controlador de Producto perron'
 	});
 }
 
-function saveRoot(req, res){
-	var root = new Root()
+function saveProducto(req, res){
+	var producto = new Producto()
 
-	var params = req.body
+	var params = req.body //recibir paramatros http
 
 	console.log(params)
 
-	root.name = params.name
-	root.role = 'ROLE_ROOT'
-	root.image = 'null'
-
-	if(params.password){
-		// Hashear contraseña
-		bcrypt.hash(params.password, null, null, function(err, hash){
-			root.password = hash
-
-			if(root.name != null){
-				// Guardar el usuario
-				root.save((err, rootStored) => {
-					if(err){
-						res.status(500).send({message: 'Error al guardar el root'})
-					}else{
-						if(!rootStored){
-							res.status(404).send({message: 'No se ha registrado el root'})
-						}else{
-							res.status(200).send({root: rootStored})
-						}
-					}
-				});
-
+	producto.id = params.id
+	producto.name = params.name
+	producto.image = 'null'
+	producto.description = params.description
+	producto.save((err, productoStored) => {
+		if(err){
+			res.status(500).send({message: 'Error al guardar el producto'})
+		}else{
+			if(!productoStored){
+				res.status(404).send({message: 'No se ha registrado el producto'})
 			}else{
-			    res.status(200).send({message: 'Rellena todos los campos'})
+				res.status(200).send({producto: productoStored})
 			}
-		})
-	}else{
-		res.status(200).send({message: 'Introduce la contraseña'})
-	}
-
+		}
+	});
 }
 
-function loginRoot(req, res){
+function get(req, res){
 	var params = req.body
-
-	var name  = params.name
-	var password = params.password
-
-	Root.findOne({name: name.toLowerCase()}, (err, root) => {
+	console.log(params);
+	var id  = params.id
+	Producto.find({id:id}, (err, producto) => {
 		if(err){
 			res.status(500).send({message: 'Error en la petición'})
 		}else{
-			if(!root){
-				res.status(404).send({message: 'El root no existe'})
+			if(!producto){
+				res.status(404).send({message: 'El producto no existe'})
 			}else{
-				// Comprobar la contraseña
-				bcrypt.compare(password, root.password, function(err, check){
-					if(check){
-						//devolver los datos del usuario logueado
-						if(params.gethash){
-							// devolver un token de jwt
-							res.status(200).send({
-								token: jwt.createTokenRoot(root)
-							})
-						}else{
-							res.status(200).send({root})
-						}
-					}else{
-						res.status(404).send({message: 'El root no ha podido loguease'})
-					}
-				})
+				res.status(200).send({producto})
 			}
 		}
 	});
@@ -154,9 +121,6 @@ function getImageFile(req, res){
 
 module.exports = {
 	pruebas,
-	saveRoot,
-	loginRoot,
-	updateRoot,
-	uploadImage,
-	getImageFile
+	saveProducto,
+	get
 };

@@ -6,7 +6,7 @@ var bodyParser = require('body-parser');
 var app = express();
 
 // cargar rutas
-var root_routes = require('./routes/root');
+var producto_routes = require('./routes/producto');
 // var root_routes = require('./routes/root');
 // var adminUsers_routes = require('./routes/adminUsers');
 // var adminCont_routes = require('./routes/adminCont');
@@ -26,7 +26,7 @@ app.use((req, res, next) => {
 
 // rutas base
 // app.use('/api', user_routes)
-app.use('/api', root_routes)
+app.use('/productos', producto_routes)
 // app.use('/api', adminUsers_routes)
 // app.use('/api', adminCont_routes)
 
